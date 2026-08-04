@@ -1,0 +1,27 @@
+# The web tier's dependencies.
+#
+# The dashboard imports the `ml` package from the repository root -- it does not
+# reimplement the feature vocabulary, the calibration or the intervention
+# taxonomy -- so it needs the modelling stack at runtime as well as the web one.
+# Installing the root requirements.txt installs this file's contents and the
+# training-only extras (Optuna, LIME) with it.
+#
+#     pip install -r ../requirements.txt        (recommended: one environment)
+#     pip install -r requirements.txt           (web tier only)
+
+# --- Web application ---
+Django==4.2.30
+djangorestframework==3.17.1
+
+# --- Needed to load and score the registered artefacts ---
+numpy==2.4.6
+pandas==3.0.3
+scipy==1.18.0
+joblib==1.5.3
+scikit-learn==1.9.0
+xgboost==3.3.0
+imbalanced-learn==0.14.2        # the fitted pipelines carry a sampler step
+shap==0.52.0                    # per-customer explanations are recomputed at scoring time
+
+# --- Charts, rendered server-side into the page ---
+matplotlib==3.11.0

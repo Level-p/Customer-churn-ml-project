@@ -1,0 +1,625 @@
+{
+  "model_key": "logistic_regression",
+  "model_label": "Logistic Regression",
+  "dataset": "bank_churn",
+  "dataset_domain": "Retail banking",
+  "dataset_description": "Retail banking customers. The positive class is a client who has closed their account.",
+  "version": "20260714T161337Z",
+  "task": "binary",
+  "classes": [
+    0,
+    1
+  ],
+  "class_order": [
+    0,
+    1
+  ],
+  "positive_label": 1,
+  "focus_label": 1,
+  "focus_index": 1,
+  "target": "Exited",
+  "threshold": 0.4411764705882353,
+  "threshold_choice": {
+    "threshold": 0.4411764705882353,
+    "precision": 0.671124318969787,
+    "recall": 0.40017720023626696,
+    "f1": 0.5013876040703052,
+    "min_precision": 0.6,
+    "satisfied_floor": true,
+    "rationale": "max F1 among thresholds with precision >= 0.60"
+  },
+  "feature_columns": [
+    "CreditScore",
+    "Age",
+    "Tenure",
+    "Balance",
+    "NumOfProducts",
+    "HasCrCard",
+    "IsActiveMember",
+    "EstimatedSalary",
+    "balance_to_salary",
+    "products_per_tenure",
+    "tenure_ratio",
+    "Geography",
+    "Gender"
+  ],
+  "numeric_columns": [
+    "CreditScore",
+    "Age",
+    "Tenure",
+    "Balance",
+    "NumOfProducts",
+    "HasCrCard",
+    "IsActiveMember",
+    "EstimatedSalary",
+    "balance_to_salary",
+    "products_per_tenure",
+    "tenure_ratio"
+  ],
+  "categorical_columns": [
+    "Geography",
+    "Gender"
+  ],
+  "transformed_feature_names": [
+    "num__CreditScore",
+    "num__Age",
+    "num__Tenure",
+    "num__Balance",
+    "num__NumOfProducts",
+    "num__HasCrCard",
+    "num__IsActiveMember",
+    "num__EstimatedSalary",
+    "num__balance_to_salary",
+    "num__products_per_tenure",
+    "num__tenure_ratio",
+    "cat__Geography_France",
+    "cat__Geography_Germany",
+    "cat__Geography_Spain",
+    "cat__Gender_Female",
+    "cat__Gender_Male"
+  ],
+  "dropped_columns": {
+    "near_zero_variance": [],
+    "correlated": [
+      "balance_per_product",
+      "zero_balance"
+    ]
+  },
+  "hyperparameters": {
+    "C": 0.05,
+    "class_weight": null
+  },
+  "cross_validation": {
+    "scoring": "average_precision",
+    "folds": 10,
+    "best_score": 0.5872653993689452,
+    "best_score_std": 0.025656640826672072,
+    "candidates": 14
+  },
+  "calibration": {
+    "method": "isotonic",
+    "folds": 5,
+    "brier_raw": 0.17199322784976714,
+    "brier_calibrated": 0.12299581110107696,
+    "improvement": 0.04899741674869018
+  },
+  "metrics": {
+    "accuracy": 0.8415,
+    "precision": 0.6985018726591761,
+    "recall": 0.44089834515366433,
+    "f1": 0.5405797101449276,
+    "roc_auc": 0.8309561500949675,
+    "mcc": 0.4680917057838221,
+    "brier": 0.11731890611209748
+  },
+  "evaluation": {
+    "task": "binary",
+    "classes": [
+      0,
+      1
+    ],
+    "threshold": 0.4411764705882353,
+    "accuracy": 0.8415,
+    "precision": 0.6985018726591761,
+    "recall": 0.44089834515366433,
+    "f1": 0.5405797101449276,
+    "roc_auc": 0.8309561500949675,
+    "mcc": 0.4680917057838221,
+    "brier": 0.11731890611209748,
+    "confusion_matrix": [
+      [
+        2993,
+        161
+      ],
+      [
+        473,
+        373
+      ]
+    ],
+    "per_class": {
+      "0": {
+        "precision": 0.8635314483554529,
+        "recall": 0.9489537095751427,
+        "f1": 0.9042296072507553
+      },
+      "1": {
+        "precision": 0.6985018726591761,
+        "recall": 0.44089834515366433,
+        "f1": 0.5405797101449276
+      }
+    },
+    "support": {
+      "0": 3154,
+      "1": 846
+    },
+    "profit": {
+      "true_positives": 373,
+      "false_positives": 161,
+      "false_negatives": 473,
+      "true_negatives": 2993,
+      "total_value": -59715.0,
+      "value_per_record": -14.92875,
+      "records_targeted": 534,
+      "value_per_targeted_record": -111.82584269662921,
+      "economics": {
+        "value_true_positive": 100.0,
+        "cost_false_positive": 15.0,
+        "cost_false_negative": 200.0,
+        "value_true_negative": 0.0
+      }
+    },
+    "report_text": "              precision    recall  f1-score   support\n\n           0       0.86      0.95      0.90      3154\n           1       0.70      0.44      0.54       846\n\n    accuracy                           0.84      4000\n   macro avg       0.78      0.69      0.72      4000\nweighted avg       0.83      0.84      0.83      4000\n",
+    "extras": {}
+  },
+  "global_importance": [
+    {
+      "rank": 1,
+      "feature": "num__Age",
+      "label": "Age",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.552513634394743,
+      "mean_shap": -0.12122833957275961,
+      "direction": "decreases"
+    },
+    {
+      "rank": 2,
+      "feature": "num__IsActiveMember",
+      "label": "Active member",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 0.5487174380341981,
+      "mean_shap": -0.033710433589901806,
+      "direction": "decreases"
+    },
+    {
+      "rank": 3,
+      "feature": "num__NumOfProducts",
+      "label": "Products held",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.34495787370530023,
+      "mean_shap": -0.07486575787417502,
+      "direction": "decreases"
+    },
+    {
+      "rank": 4,
+      "feature": "cat__Geography_Germany",
+      "label": "Country: Germany",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.22507775340135674,
+      "mean_shap": 0.0009813295840659568,
+      "direction": "increases"
+    },
+    {
+      "rank": 5,
+      "feature": "cat__Gender_Male",
+      "label": "Gender: Male",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.20387579906971245,
+      "mean_shap": 0.00313077087023513,
+      "direction": "increases"
+    },
+    {
+      "rank": 6,
+      "feature": "cat__Geography_France",
+      "label": "Country: France",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.18831553273928175,
+      "mean_shap": 0.007489298597683184,
+      "direction": "increases"
+    },
+    {
+      "rank": 7,
+      "feature": "cat__Geography_Spain",
+      "label": "Country: Spain",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.1390774500793054,
+      "mean_shap": -0.007567696799962398,
+      "direction": "decreases"
+    },
+    {
+      "rank": 8,
+      "feature": "cat__Gender_Female",
+      "label": "Gender: Female",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.13048174692519757,
+      "mean_shap": 0.0020037123299323873,
+      "direction": "increases"
+    },
+    {
+      "rank": 9,
+      "feature": "num__HasCrCard",
+      "label": "Holds a credit card",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.07127211269540415,
+      "mean_shap": 0.002021166702592198,
+      "direction": "increases"
+    },
+    {
+      "rank": 10,
+      "feature": "num__Tenure",
+      "label": "Years as a customer",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.053594098579485855,
+      "mean_shap": 0.0045924210078246526,
+      "direction": "increases"
+    },
+    {
+      "rank": 11,
+      "feature": "num__CreditScore",
+      "label": "Credit score",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.053386538340233845,
+      "mean_shap": 0.008019680123839945,
+      "direction": "increases"
+    },
+    {
+      "rank": 12,
+      "feature": "num__products_per_tenure",
+      "label": "Products taken up per year",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.030305094068867663,
+      "mean_shap": -0.002151608241801281,
+      "direction": "decreases"
+    },
+    {
+      "rank": 13,
+      "feature": "num__Balance",
+      "label": "Account balance",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.015918956908615594,
+      "mean_shap": 0.0006499014931225867,
+      "direction": "increases"
+    },
+    {
+      "rank": 14,
+      "feature": "num__tenure_ratio",
+      "label": "Share of adult life as a customer",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.0074433552638598225,
+      "mean_shap": -0.0001631379639910932,
+      "direction": "decreases"
+    },
+    {
+      "rank": 15,
+      "feature": "num__EstimatedSalary",
+      "label": "Estimated salary",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.0048744029213576194,
+      "mean_shap": 0.0007659779768018288,
+      "direction": "increases"
+    },
+    {
+      "rank": 16,
+      "feature": "num__balance_to_salary",
+      "label": "Balance against salary",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 6.511689042252428e-05,
+      "mean_shap": 1.4800477418114508e-05,
+      "direction": "increases"
+    }
+  ],
+  "explanation_audit": {
+    "records_audited": 100,
+    "top_k": 5,
+    "mean_top_k_overlap": 0.8399999999999999,
+    "mean_jaccard": 0.740952380952381,
+    "mean_order_agreement": 0.7202833333333334,
+    "lime_stability": 0.9,
+    "contested_features": [
+      {
+        "feature": "cat__Geography_Spain",
+        "label": "Country: Spain",
+        "shap_top_k_count": 18,
+        "lime_disagreements": 16,
+        "disagreement_rate": 0.8888888888888888
+      },
+      {
+        "feature": "cat__Geography_France",
+        "label": "Country: France",
+        "shap_top_k_count": 65,
+        "lime_disagreements": 42,
+        "disagreement_rate": 0.6461538461538462
+      },
+      {
+        "feature": "num__Age",
+        "label": "Age",
+        "shap_top_k_count": 82,
+        "lime_disagreements": 11,
+        "disagreement_rate": 0.13414634146341464
+      },
+      {
+        "feature": "cat__Gender_Male",
+        "label": "Gender: Male",
+        "shap_top_k_count": 86,
+        "lime_disagreements": 6,
+        "disagreement_rate": 0.06976744186046512
+      },
+      {
+        "feature": "num__NumOfProducts",
+        "label": "Products held",
+        "shap_top_k_count": 100,
+        "lime_disagreements": 1,
+        "disagreement_rate": 0.01
+      }
+    ]
+  },
+  "contested_features": [
+    "cat__Geography_Spain",
+    "cat__Geography_France"
+  ],
+  "fairness": {
+    "sensitive_attributes": [
+      "Gender",
+      "Geography",
+      "Age"
+    ],
+    "attributes": {
+      "Gender": {
+        "label": "Gender",
+        "segments": [
+          {
+            "group": "Male",
+            "records": 2265,
+            "base_rate": 0.1532008830022075,
+            "selection_rate": 0.06887417218543046,
+            "true_positive_rate": 0.3025936599423631,
+            "false_positive_rate": 0.026590198123044837,
+            "precision": 0.6730769230769231,
+            "reliable": true
+          },
+          {
+            "group": "Female",
+            "records": 1735,
+            "base_rate": 0.2876080691642651,
+            "selection_rate": 0.21786743515850143,
+            "true_positive_rate": 0.5370741482965932,
+            "false_positive_rate": 0.0889967637540453,
+            "precision": 0.708994708994709,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.31612880619503136,
+        "true_positive_rate_gap": 0.23448048835423008,
+        "flags": [
+          "selection-rate ratio 0.32 is below the four-fifths convention",
+          "true-positive-rate gap of 0.23 between groups: the churners in one group are materially less likely to be offered anything"
+        ]
+      },
+      "Geography": {
+        "label": "Country",
+        "segments": [
+          {
+            "group": "France",
+            "records": 2249,
+            "base_rate": 0.1627389951089373,
+            "selection_rate": 0.06669630947087594,
+            "true_positive_rate": 0.29508196721311475,
+            "false_positive_rate": 0.022304832713754646,
+            "precision": 0.72,
+            "reliable": true
+          },
+          {
+            "group": "Spain",
+            "records": 895,
+            "base_rate": 0.17653631284916202,
+            "selection_rate": 0.06815642458100558,
+            "true_positive_rate": 0.23417721518987342,
+            "false_positive_rate": 0.032564450474898234,
+            "precision": 0.6065573770491803,
+            "reliable": true
+          },
+          {
+            "group": "Germany",
+            "records": 856,
+            "base_rate": 0.37616822429906543,
+            "selection_rate": 0.3773364485981308,
+            "true_positive_rate": 0.7080745341614907,
+            "false_positive_rate": 0.17790262172284643,
+            "precision": 0.7058823529411765,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.1767555446039313,
+        "true_positive_rate_gap": 0.47389731897161724,
+        "flags": [
+          "selection-rate ratio 0.18 is below the four-fifths convention",
+          "true-positive-rate gap of 0.47 between groups: the churners in one group are materially less likely to be offered anything"
+        ]
+      },
+      "Age": {
+        "label": "Age",
+        "segments": [
+          {
+            "group": "30-44",
+            "records": 2643,
+            "base_rate": 0.1513431706394249,
+            "selection_rate": 0.06242905788876277,
+            "true_positive_rate": 0.245,
+            "false_positive_rate": 0.029870708872046365,
+            "precision": 0.593939393939394,
+            "reliable": true
+          },
+          {
+            "group": "45-59",
+            "records": 665,
+            "base_rate": 0.5413533834586466,
+            "selection_rate": 0.4481203007518797,
+            "true_positive_rate": 0.6555555555555556,
+            "false_positive_rate": 0.20327868852459016,
+            "precision": 0.7919463087248322,
+            "reliable": true
+          },
+          {
+            "group": "Under 30",
+            "records": 586,
+            "base_rate": 0.07337883959044368,
+            "selection_rate": 0.0,
+            "true_positive_rate": 0.0,
+            "false_positive_rate": 0.0,
+            "precision": null,
+            "reliable": true
+          },
+          {
+            "group": "60 and over",
+            "records": 106,
+            "base_rate": 0.4056603773584906,
+            "selection_rate": 0.6698113207547169,
+            "true_positive_rate": 0.9069767441860465,
+            "false_positive_rate": 0.5079365079365079,
+            "precision": 0.5492957746478874,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.09320394558040639,
+        "true_positive_rate_gap": 0.9069767441860465,
+        "flags": [
+          "selection-rate ratio 0.09 is below the four-fifths convention",
+          "true-positive-rate gap of 0.91 between groups: the churners in one group are materially less likely to be offered anything"
+        ]
+      }
+    },
+    "proxy_candidates": [
+      {
+        "feature": "num__Age",
+        "label": "Age",
+        "rank": 1,
+        "mean_abs_shap": 0.552513634394743,
+        "category": "demographic"
+      },
+      {
+        "feature": "cat__Geography_Germany",
+        "label": "Country: Germany",
+        "rank": 4,
+        "mean_abs_shap": 0.22507775340135674,
+        "category": "demographic"
+      },
+      {
+        "feature": "cat__Gender_Male",
+        "label": "Gender: Male",
+        "rank": 5,
+        "mean_abs_shap": 0.20387579906971245,
+        "category": "demographic"
+      },
+      {
+        "feature": "cat__Geography_France",
+        "label": "Country: France",
+        "rank": 6,
+        "mean_abs_shap": 0.18831553273928175,
+        "category": "demographic"
+      },
+      {
+        "feature": "cat__Geography_Spain",
+        "label": "Country: Spain",
+        "rank": 7,
+        "mean_abs_shap": 0.1390774500793054,
+        "category": "demographic"
+      },
+      {
+        "feature": "cat__Gender_Female",
+        "label": "Gender: Female",
+        "rank": 8,
+        "mean_abs_shap": 0.13048174692519757,
+        "category": "demographic"
+      }
+    ],
+    "flags": [
+      "Gender: selection-rate ratio 0.32 is below the four-fifths convention",
+      "Gender: true-positive-rate gap of 0.23 between groups: the churners in one group are materially less likely to be offered anything",
+      "Geography: selection-rate ratio 0.18 is below the four-fifths convention",
+      "Geography: true-positive-rate gap of 0.47 between groups: the churners in one group are materially less likely to be offered anything",
+      "Age: selection-rate ratio 0.09 is below the four-fifths convention",
+      "Age: true-positive-rate gap of 0.91 between groups: the churners in one group are materially less likely to be offered anything"
+    ],
+    "selection_ratio_floor": 0.8,
+    "tpr_gap_ceiling": 0.1
+  },
+  "sensitive_attributes": [
+    "Gender",
+    "Geography",
+    "Age"
+  ],
+  "value_reference": {
+    "column": "EstimatedSalary",
+    "median": 116827.47
+  },
+  "training_snapshot": {
+    "path": "C:\\Users\\cpati\\Downloads\\B01042273\\Artifact\\datasets\\Bank\\train.csv",
+    "sha256": "ff1e0eb402d364adaf0c3f9cc8b2351cde0657642bf4cb3ed56efcf31b67d1b0",
+    "bytes": 12350130,
+    "subsampled_to": 20000,
+    "rows_total": 20000,
+    "rows_train": 16000,
+    "rows_test": 4000,
+    "class_distribution_train": {
+      "0": 0.788375,
+      "1": 0.211625
+    }
+  },
+  "economics": {
+    "value_true_positive": 100.0,
+    "cost_false_positive": 15.0,
+    "cost_false_negative": 200.0,
+    "value_true_negative": 0.0
+  },
+  "seed": 42,
+  "training_seconds": 30.52,
+  "library_versions": {
+    "python": "3.13.14",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3"
+  },
+  "created_at": "2026-07-14T16:13:37.772616+00:00",
+  "python_version": "3.13.14"
+}

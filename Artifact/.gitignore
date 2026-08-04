@@ -1,0 +1,122 @@
+# --------------------------------------------------------------------------- #
+# Secrets and local configuration
+# --------------------------------------------------------------------------- #
+# DJANGO_SECRET_KEY and any production credentials belong here, never in settings.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# --------------------------------------------------------------------------- #
+# Python
+# --------------------------------------------------------------------------- #
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib60/
+sdist/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Test and type-checking caches
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+
+# --------------------------------------------------------------------------- #
+# Django
+# --------------------------------------------------------------------------- #
+# The database holds the prediction and override audit trail. It is real
+# customer-level data in production and local scratch data in development;
+# neither belongs in version control. Rebuild with `manage.py migrate`.
+db.sqlite3
+db.sqlite3-journal
+*.sqlite3
+
+# Uploaded customer lists. These are personal data by definition -- an accidental
+# `git add` of one is a data-protection incident, not a merge conflict.
+bdss_project/media/
+
+# collectstatic output
+bdss_project/staticfiles/
+/staticfiles/
+
+# Django logs
+*.log
+
+# --------------------------------------------------------------------------- #
+# Machine learning artefacts
+# --------------------------------------------------------------------------- #
+# Trained models are large binary pickles and are reproducible from the code, the
+# data snapshot and the fixed seed recorded in each report. Rebuild them with
+# `python -m ml.train_all`. The registry manifest is ignored with them: a manifest
+# that survives without the artefacts it indexes points the dashboard at files
+# that are not there.
+models/*.joblib
+models/registry.json
+
+# Evaluation reports and model comparisons are small JSON and *are* the evidence
+# for what a model scored, so they are kept. If you would rather not track them,
+# uncomment the next two lines.
+# reports/*.json
+# !reports/.gitkeep
+
+# Optuna study databases, if a persistent storage backend is ever configured
+*.db-journal
+optuna*.db
+
+# Matplotlib font cache, occasionally written into the working tree
+.matplotlib/
+
+# --------------------------------------------------------------------------- #
+# Data
+# --------------------------------------------------------------------------- #
+# The datasets in datasets/ are tracked deliberately: the training scripts are
+# useless without them, and their SHA-256 is recorded in every model artefact, so
+# the data that produced a model has to be reachable for the provenance claim to
+# mean anything.
+#
+# If they are ever replaced with real customer data, or grow past what a Git
+# repository should carry, ignore them here and distribute them out of band --
+# and note that no *real* customer data should be committed under any
+# circumstances, regardless of size.
+# datasets/
+
+# Scratch space
+scratch/
+tmp/
+*.tmp
+
+# --------------------------------------------------------------------------- #
+# Editors and operating systems
+# --------------------------------------------------------------------------- #
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

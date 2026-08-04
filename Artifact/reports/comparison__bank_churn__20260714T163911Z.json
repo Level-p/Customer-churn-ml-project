@@ -1,0 +1,63 @@
+{
+  "dataset": "bank_churn",
+  "generated_at": "20260714T163911Z",
+  "seed": 42,
+  "models": [
+    {
+      "model": "Logistic Regression",
+      "model_key": "logistic_regression",
+      "version": "20260714T161337Z",
+      "precision": 0.6985018726591761,
+      "recall": 0.44089834515366433,
+      "f1": 0.5405797101449276,
+      "roc_auc": 0.8309561500949675,
+      "mcc": 0.4680917057838221,
+      "brier": 0.11731890611209748,
+      "shap_lime_overlap": 0.8399999999999999,
+      "lime_stability": 0.9,
+      "value_per_record": -14.92875,
+      "threshold": 0.4411764705882353,
+      "training_seconds": 30.52
+    },
+    {
+      "model": "Random Forest",
+      "model_key": "random_forest",
+      "version": "20260714T163601Z",
+      "precision": 0.6134903640256959,
+      "recall": 0.6773049645390071,
+      "f1": 0.6438202247191012,
+      "roc_auc": 0.8808355857172625,
+      "mcc": 0.5433090898245411,
+      "brier": 0.10141721642985138,
+      "shap_lime_overlap": 0.7159999999999997,
+      "lime_stability": 0.7357142857142859,
+      "value_per_record": -0.67875,
+      "threshold": 0.325,
+      "training_seconds": 1343.77
+    },
+    {
+      "model": "XGBoost",
+      "model_key": "xgboost",
+      "version": "20260714T163911Z",
+      "precision": 0.6235780765253361,
+      "recall": 0.7127659574468085,
+      "f1": 0.6651958080529509,
+      "roc_auc": 0.8827733479644595,
+      "mcc": 0.5697712177819184,
+      "brier": 0.09929820583792352,
+      "shap_lime_overlap": 0.6639999999999998,
+      "lime_stability": 0.8080952380952382,
+      "value_per_record": 1.56,
+      "threshold": 0.3287671232876712,
+      "training_seconds": 188.07
+    }
+  ],
+  "recommendation": {
+    "model_key": "xgboost",
+    "version": "20260714T163911Z",
+    "reasons": [
+      "highest MCC among audited models (0.5698)",
+      "beats the logistic baseline by 0.1017 MCC"
+    ]
+  }
+}

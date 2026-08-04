@@ -1,0 +1,77 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Score customers - Retention BDSS{% endblock %}
+{% block nav_upload %}active{% endblock %}
+
+{% block content %}
+<h1>Score a customer list</h1>
+<p class="lede">
+  Upload a CSV export from the CRM and choose a model. Columns the model does not recognise are ignored, so you do not
+  need to prepare the file. Every customer comes back with a risk band, the drivers behind it, and an action.
+</p>
+
+<div class="grid two">
+  <div class="card">
+    <form method="post" enctype="multipart/form-data" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="msg error">{{ form.non_field_errors }}</div>
+      {% endif %}
+
+      <div class="field">
+        <label for="{{ form.csv_file.id_for_label }}">{{ form.csv_file.label }}</label>
+        {{ form.csv_file }}
+        <p class="help">{{ form.csv_file.help_text }}</p>
+        {% if form.csv_file.errors %}<p class="errors">{{ form.csv_file.errors|join:" " }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label for="{{ form.model_id.id_for_label }}">{{ form.model_id.label }}</label>
+        {{ form.model_id }}
+        <p class="help">{{ form.model_id.help_text }}</p>
+        {% if form.model_id.errors %}<p class="errors">{{ form.model_id.errors|join:" " }}</p>{% endif %}
+      </div>
+
+      <div class="field">
+        <label style="font-weight:500;display:flex;gap:8px;align-items:flex-start">
+          {{ form.only_at_risk }}
+          <span>{{ form.only_at_risk.label }}</span>
+        </label>
+        <p class="help">{{ form.only_at_risk.help_text }}</p>
+      </div>
+
+      <button type="submit" class="btn" {% if not models %}disabled{% endif %}>Score customers</button>
+      {% if not models %}
+        <p class="errors">No models are registered. Run <code>python -m ml.train_all</code> first.</p>
+      {% endif %}
+    </form>
+  </div>
+
+  <div class="card">
+    <h2>What the model expects</h2>
+    <p class="muted">
+      Each model was trained on one domain and knows only that domain's columns. Score a banking list with a banking
+      model; a streaming list with a streaming model. If you pick the wrong pairing the system will tell you rather than
+      quietly returning nonsense.
+    </p>
+
+    {% for model in models %}
+      <details {% if forloop.first %}open{% endif %}>
+        <summary>{{ model.label }} &middot; v{{ model.version }}</summary>
+        <table style="margin-top:10px">
+          <tr><td class="muted">Trained on</td><td>{{ model.dataset }}</td></tr>
+          <tr><td class="muted">Operating threshold</td><td class="num">{{ model.threshold|floatformat:3|default:"arg-max" }}</td></tr>
+          <tr><td class="muted">Test F1 / recall</td><td class="num">{{ model.metrics.f1|floatformat:3 }} / {{ model.metrics.recall|floatformat:3 }}</td></tr>
+          <tr><td class="muted">ROC-AUC / MCC</td><td class="num">{{ model.metrics.roc_auc|floatformat:3 }} / {{ model.metrics.mcc|floatformat:3 }}</td></tr>
+        </table>
+        <p style="margin:10px 0 0"><a href="{% url 'dashboard:model_card' model.model_key model.dataset %}">Full model card &rarr;</a></p>
+      </details>
+    {% endfor %}
+
+    <p class="help" style="margin-top:16px">
+      The threshold is not 0.5. It was chosen on validation data to maximise F1 subject to a precision floor, because
+      precision is what decides how much of the retention budget is spent on customers who were never going to leave.
+    </p>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ bundle.model_label }} - Model card{% endblock %}
+{% block nav_registry %}active{% endblock %}
+
+{% block content %}
+<h1>{{ bundle.model_label }}</h1>
+<p class="lede">
+  Version {{ bundle.version }}, trained on <strong>{{ bundle.dataset_domain|default:bundle.dataset }}</strong>
+  ({{ bundle.dataset }}). Every figure below comes from a single pass over a test partition the model never saw during
+  training, tuning, calibration or threshold selection.
+</p>
+
+{% if dataset_description %}
+  <div class="msg {% if 'SUSPICION' in dataset_description %}warning{% else %}info{% endif %}">
+    <strong>About this dataset.</strong> {{ dataset_description }}
+  </div>
+{% endif %}
+
+<div class="grid tiles" style="margin-bottom:20px">
+  <div class="tile"><div class="key">F1</div><div class="value">{{ metrics.f1|floatformat:3 }}</div><div class="note">balance of precision and recall</div></div>
+  <div class="tile"><div class="key">Recall</div><div class="value">{{ metrics.recall|floatformat:3 }}</div><div class="note">churners caught</div></div>
+  <div class="tile"><div class="key">Precision</div><div class="value">{{ metrics.precision|floatformat:3 }}</div><div class="note">of those we contact</div></div>
+  <div class="tile"><div class="key">MCC</div><div class="value">{{ metrics.mcc|floatformat:3 }}</div><div class="note">conservative under imbalance</div></div>
+  <div class="tile"><div class="key">ROC-AUC</div><div class="value">{{ metrics.roc_auc|floatformat:3 }}</div><div class="note">threshold-free ranking</div></div>
+  <div class="tile"><div class="key">Brier</div><div class="value">{{ metrics.brier|floatformat:3 }}</div><div class="note">calibration loss (lower is better)</div></div>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <h2>The operating point</h2>
+    <table>
+      <tr><td class="muted">Threshold</td><td class="num">{{ bundle.threshold|floatformat:4|default:"arg-max" }}</td></tr>
+      <tr><td class="muted">How it was chosen</td><td>{{ threshold_choice.rationale|default:"Arg-max over the class probabilities." }}</td></tr>
+      <tr><td class="muted">Precision floor</td><td class="num">{{ threshold_choice.min_precision|floatformat:2 }}</td></tr>
+      <tr><td class="muted">Floor met?</td><td>
+        {% if threshold_choice.satisfied_floor %}<span class="badge low"><span class="dot"></span>Yes</span>
+        {% else %}<span class="badge high"><span class="dot"></span>No - reported, not hidden</span>{% endif %}
+      </td></tr>
+      <tr><td class="muted">Calibration</td><td>
+        Brier {{ calibration.brier_raw|floatformat:4 }} &rarr; {{ calibration.brier_calibrated|floatformat:4 }}
+        <span class="muted">(isotonic, {{ calibration.folds }} out-of-fold)</span>
+      </td></tr>
+    </table>
+    <p class="help" style="margin-top:12px">
+      The threshold is a business decision wearing a technical disguise. It was set on validation folds to maximise F1
+      subject to a precision floor, because precision is what decides how much retention budget is spent on customers who
+      were never going to leave.
+    </p>
+  </div>
+
+  <div class="card">
+    <h2>What it is worth</h2>
+    {% if profit %}
+      <table>
+        <tr><td class="muted">Campaign value on the test partition</td><td class="num">{{ profit.total_value|floatformat:0 }}</td></tr>
+        <tr><td class="muted">Value per customer scored</td><td class="num">{{ profit.value_per_record|floatformat:2 }}</td></tr>
+        <tr><td class="muted">Customers it would contact</td><td class="num">{{ profit.records_targeted }}</td></tr>
+        <tr><td class="muted">Caught / missed</td><td class="num">{{ profit.true_positives }} / {{ profit.false_negatives }}</td></tr>
+        <tr><td class="muted">Contacted needlessly</td><td class="num">{{ profit.false_positives }}</td></tr>
+      </table>
+      <p class="help" style="margin-top:12px">
+        Valued at {{ profit.economics.value_true_positive|floatformat:0 }} for a customer retained,
+        {{ profit.economics.cost_false_positive|floatformat:0 }} for an offer wasted, and
+        {{ profit.economics.cost_false_negative|floatformat:0 }} for a customer lost.
+        <strong>These are placeholders.</strong> They are the first thing an adopting firm must replace with its own
+        numbers, because they, not the model, decide where the threshold lands.
+      </p>
+    {% else %}
+      <p class="muted">Profit reading is reported for binary tasks only.</p>
+    {% endif %}
+    <h3 style="margin-top:18px">Confusion matrix</h3>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Actual \ predicted</th>{% for label in evaluation.classes %}<th class="num">{{ label }}</th>{% endfor %}<th class="num">Total</th></tr></thead>
+        <tbody>
+        {% for row in confusion %}
+          <tr><td><strong>{{ row.label }}</strong></td>{% for cell in row.cells %}<td class="num">{{ cell }}</td>{% endfor %}<td class="num muted">{{ row.total }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="card">
+  <h2>What drives churn, according to this model</h2>
+  {% if importance_chart %}
+    <figure>
+      <img src="data:image/png;base64,{{ importance_chart }}"
+           alt="Horizontal bar chart of the leading churn drivers by mean absolute SHAP value, coloured by feature category.">
+    </figure>
+  {% endif %}
+  <p class="help">
+    These are Shapley attributions: they describe how the model behaves, not why customers behave as they do. A driver
+    whose direction contradicts what the business knows is a data-quality question, not a discovery.
+  </p>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <h2>Do we believe the explanations?</h2>
+    {% if audit.records_audited %}
+      <table>
+        <tr><td class="muted">Customers audited</td><td class="num">{{ audit.records_audited }}</td></tr>
+        <tr><td class="muted">SHAP and LIME agree on the top {{ audit.top_k }}</td><td class="num">{{ audit.mean_top_k_overlap|floatformat:2 }}</td></tr>
+        <tr><td class="muted">Agreement on the ordering</td><td class="num">{{ audit.mean_order_agreement|floatformat:2 }}</td></tr>
+        <tr><td class="muted">LIME's agreement with itself</td><td class="num">{{ audit.lime_stability|floatformat:2 }}</td></tr>
+      </table>
+      {% if audit.contested_features %}
+        <h3 style="margin-top:16px">Drivers the two explainers dispute</h3>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Driver</th><th class="num">Disagreement rate</th></tr></thead>
+            <tbody>
+            {% for feature in audit.contested_features|slice:":6" %}
+              <tr><td>{{ feature.label }}</td><td class="num">{{ feature.disagreement_rate|floatformat:2 }}</td></tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="help" style="margin-top:10px">
+          A recommendation resting on one of these carries a caveat in the queue. Agreement between two post-hoc methods
+          is evidence of robustness, not proof of fidelity.
+        </p>
+      {% endif %}
+    {% else %}
+      <div class="msg warning">This model carries no explanation audit. It was trained with <code>--no-audit</code>.</div>
+    {% endif %}
+  </div>
+
+  <div class="card">
+    <h2>Who does it fail?</h2>
+    {% if fairness.attributes %}
+      {% for attribute, result in fairness.attributes.items %}
+        <h3>{{ result.label }}</h3>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Group</th><th class="num">Churn</th><th class="num">Targeted</th><th class="num">Caught</th></tr></thead>
+            <tbody>
+            {% for segment in result.segments %}
+              <tr>
+                <td>{{ segment.group }} <span class="muted">({{ segment.records }})</span></td>
+                <td class="num">{{ segment.base_rate|floatformat:2 }}</td>
+                <td class="num">{{ segment.selection_rate|floatformat:2 }}</td>
+                <td class="num">{{ segment.true_positive_rate|floatformat:2|default:"n/a" }}</td>
+              </tr>
+            {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% for flag in result.flags %}
+          <div class="msg warning" style="margin-top:8px;font-size:13px">{{ flag }}</div>
+        {% endfor %}
+      {% endfor %}
+
+      {% if fairness.proxy_candidates %}
+        <div class="msg warning" style="font-size:13px">
+          <strong>Demographic attributes are among this model's leading drivers:</strong>
+          {% for candidate in fairness.proxy_candidates %}{{ candidate.label }}{% if not forloop.last %}, {% endif %}{% endfor %}.
+          They are explained but never converted into an offer: a customer whose strongest driver is demographic is routed
+          to a human, not to a discount.
+        </div>
+      {% endif %}
+      <p class="help">
+        A gap is not automatically an injustice -- it can faithfully reflect a real difference in churn between groups, and
+        equalising it by fiat would withhold help from the group that needs it most. What the audit does is make the gap
+        impossible to ship without having looked at it.
+      </p>
+    {% else %}
+      <p class="muted">No sensitive attributes were declared for this dataset.</p>
+    {% endif %}
+  </div>
+</div>
+
+<div class="card">
+  <h2>Provenance</h2>
+  <div class="grid two">
+    <table>
+      <tr><td class="muted">Trained at</td><td>{{ bundle.created_at }}</td></tr>
+      <tr><td class="muted">Training seconds</td><td class="num">{{ bundle.training_seconds }}</td></tr>
+      <tr><td class="muted">Random seed</td><td class="num">{{ bundle.seed }}</td></tr>
+      <tr><td class="muted">Rows (train / test)</td><td class="num">{{ snapshot.rows_train }} / {{ snapshot.rows_test }}</td></tr>
+      <tr><td class="muted">Source data SHA-256</td><td class="muted" style="word-break:break-all;font-size:12px">{{ snapshot.sha256 }}</td></tr>
+      <tr><td class="muted">Cross-validated {{ cross_validation.scoring }}</td><td class="num">{{ cross_validation.best_score|floatformat:4 }}</td></tr>
+      <tr><td class="muted">Served / overridden</td><td class="num">{{ usage.served }} / {{ usage.overridden }}</td></tr>
+    </table>
+    <div>
+      <h3>Hyperparameters</h3>
+      <div class="scroll">
+        <table>
+          {% for key, value in hyperparameters.items %}
+            <tr><td class="muted">{{ key }}</td><td class="num">{{ value }}</td></tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+  <p class="help" style="margin-top:12px">
+    The data snapshot, the seed and the hyperparameters are recorded so that this exact model can be rebuilt, and any
+    decision it informed can be reproduced as it stood on the day it was taken.
+  </p>
+</div>
+{% endblock %}

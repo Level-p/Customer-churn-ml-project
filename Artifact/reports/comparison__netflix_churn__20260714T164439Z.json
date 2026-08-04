@@ -1,0 +1,63 @@
+{
+  "dataset": "netflix_churn",
+  "generated_at": "20260714T164439Z",
+  "seed": 42,
+  "models": [
+    {
+      "model": "Logistic Regression",
+      "model_key": "logistic_regression",
+      "version": "20260714T164015Z",
+      "precision": 0.8747628083491461,
+      "recall": 0.9165009940357853,
+      "f1": 0.8951456310679612,
+      "roc_auc": 0.9661167802040874,
+      "mcc": 0.7848352317224362,
+      "brier": 0.07294663583367628,
+      "shap_lime_overlap": 0.778,
+      "lime_stability": 0.7983333333333333,
+      "value_per_record": 36.71,
+      "threshold": 0.5,
+      "training_seconds": 61.18
+    },
+    {
+      "model": "Random Forest",
+      "model_key": "random_forest",
+      "version": "20260714T164307Z",
+      "precision": 0.992,
+      "recall": 0.9860834990059643,
+      "f1": 0.9890329012961117,
+      "roc_auc": 0.9984079426859367,
+      "mcc": 0.9780176044753222,
+      "brier": 0.008925153159832711,
+      "shap_lime_overlap": 0.7219999999999998,
+      "lime_stability": 0.7704761904761905,
+      "value_per_record": 48.14,
+      "threshold": 0.5,
+      "training_seconds": 171.08
+    },
+    {
+      "model": "XGBoost",
+      "model_key": "xgboost",
+      "version": "20260714T164439Z",
+      "precision": 0.9940119760479041,
+      "recall": 0.9900596421471173,
+      "f1": 0.9920318725099602,
+      "roc_auc": 0.999877995607842,
+      "mcc": 0.9840076802795611,
+      "brier": 0.004524974070215432,
+      "shap_lime_overlap": 0.7939999999999999,
+      "lime_stability": 0.8252380952380953,
+      "value_per_record": 48.755,
+      "threshold": 0.6666666666666666,
+      "training_seconds": 92.34
+    }
+  ],
+  "recommendation": {
+    "model_key": "xgboost",
+    "version": "20260714T164439Z",
+    "reasons": [
+      "highest MCC among audited models (0.9840)",
+      "beats the logistic baseline by 0.1992 MCC"
+    ]
+  }
+}

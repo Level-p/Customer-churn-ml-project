@@ -1,0 +1,178 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Retention Decision Support{% endblock %}</title>
+  <style>
+    /* Self-contained: no CDN, no external font. This page shows customer-level
+       risk, and it should not be phoning anywhere to render it. */
+    :root {
+      --surface: #ffffff;
+      --plane: #f7f7f5;
+      --ink: #0b0b0b;
+      --ink-2: #52514e;
+      --ink-muted: #898781;
+      --line: #e1e0d9;
+      --line-strong: #c3c2b7;
+      --accent: #1c5cab;
+      --accent-soft: #eef4fd;
+      --high: #b42318;
+      --medium: #b54708;
+      --low: #067647;
+      --high-soft: #fef3f2;
+      --medium-soft: #fffaeb;
+      --low-soft: #ecfdf3;
+      --radius: 10px;
+      --shadow: 0 1px 2px rgba(11,11,11,.06), 0 1px 3px rgba(11,11,11,.04);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: var(--plane);
+      color: var(--ink);
+      font: 15px/1.55 system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    a { color: var(--accent); }
+    header.top {
+      background: var(--surface);
+      border-bottom: 1px solid var(--line);
+      position: sticky; top: 0; z-index: 20;
+    }
+    .bar { max-width: 1180px; margin: 0 auto; padding: 12px 24px; display: flex; align-items: center; gap: 28px; }
+    .brand { font-weight: 700; letter-spacing: -.01em; font-size: 15px; }
+    .brand span { display: block; font-weight: 400; font-size: 12px; color: var(--ink-muted); }
+    nav { display: flex; gap: 4px; flex: 1; flex-wrap: wrap; }
+    nav a {
+      padding: 7px 12px; border-radius: 7px; text-decoration: none;
+      color: var(--ink-2); font-size: 14px; font-weight: 500;
+    }
+    nav a:hover { background: var(--plane); }
+    nav a.active { background: var(--accent-soft); color: var(--accent); }
+    .who { font-size: 13px; color: var(--ink-muted); display: flex; align-items: center; gap: 10px; }
+    .linkbtn { background: none; border: 0; color: var(--accent); font: inherit; cursor: pointer; padding: 0; text-decoration: underline; }
+
+    main { max-width: 1180px; margin: 0 auto; padding: 28px 24px 72px; }
+    h1 { font-size: 24px; letter-spacing: -.02em; margin: 0 0 6px; }
+    h2 { font-size: 17px; margin: 0 0 14px; letter-spacing: -.01em; }
+    h3 { font-size: 14px; margin: 0 0 8px; }
+    .lede { color: var(--ink-2); margin: 0 0 24px; max-width: 74ch; }
+
+    .card {
+      background: var(--surface); border: 1px solid var(--line);
+      border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+    .grid { display: grid; gap: 20px; }
+    .grid.two { grid-template-columns: 1fr 1fr; }
+    .grid.tiles { grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); }
+    @media (max-width: 860px) { .grid.two { grid-template-columns: 1fr; } }
+
+    .tile { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; }
+    .tile .value { font-size: 27px; font-weight: 650; letter-spacing: -.02em; }
+    .tile .key { font-size: 12px; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .05em; margin-bottom: 4px; }
+    .tile .note { font-size: 12px; color: var(--ink-2); margin-top: 4px; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th { text-align: left; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-muted); font-weight: 600; padding: 8px 10px; border-bottom: 1px solid var(--line-strong); }
+    td { padding: 11px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    tr:last-child td { border-bottom: 0; }
+    .num { font-variant-numeric: tabular-nums; text-align: right; }
+    .scroll { overflow-x: auto; }
+
+    /* Status is never colour alone: every badge carries its name in text. */
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+    .badge .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .badge.high { color: var(--high); background: var(--high-soft); }
+    .badge.medium { color: var(--medium); background: var(--medium-soft); }
+    .badge.low { color: var(--low); background: var(--low-soft); }
+    .badge.P1 { color: var(--high); background: var(--high-soft); }
+    .badge.P2 { color: var(--medium); background: var(--medium-soft); }
+    .badge.P3 { color: var(--low); background: var(--low-soft); }
+    .badge.neutral { color: var(--ink-2); background: var(--plane); }
+
+    .chip { display: inline-block; font-size: 11px; padding: 2px 7px; border-radius: 5px; background: var(--plane); color: var(--ink-2); border: 1px solid var(--line); }
+    .up { color: var(--high); font-weight: 600; }
+    .down { color: var(--low); font-weight: 600; }
+    .muted { color: var(--ink-muted); font-size: 13px; }
+
+    .btn {
+      display: inline-block; background: var(--accent); color: #fff; border: 0;
+      padding: 9px 16px; border-radius: 8px; font: inherit; font-weight: 600;
+      font-size: 14px; cursor: pointer; text-decoration: none;
+    }
+    .btn:hover { background: #184f95; }
+    .btn.ghost { background: var(--surface); color: var(--ink); border: 1px solid var(--line-strong); }
+    .btn.ghost:hover { background: var(--plane); }
+    .btn.small { padding: 5px 11px; font-size: 13px; }
+
+    label { display: block; font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+    .help { font-size: 13px; color: var(--ink-muted); margin: 4px 0 0; }
+    input[type=file], select, textarea, input[type=text], input[type=password] {
+      width: 100%; padding: 9px 11px; border: 1px solid var(--line-strong);
+      border-radius: 8px; font: inherit; background: var(--surface); color: var(--ink);
+    }
+    .field { margin-bottom: 18px; }
+    .errors { color: var(--high); font-size: 13px; margin: 6px 0 0; }
+
+    .msg { padding: 11px 15px; border-radius: 8px; margin-bottom: 14px; font-size: 14px; border: 1px solid; }
+    .msg.success { background: var(--low-soft); border-color: #abefc6; color: #085d3a; }
+    .msg.warning { background: var(--medium-soft); border-color: #fedf89; color: #93370d; }
+    .msg.error { background: var(--high-soft); border-color: #fecdca; color: #912018; }
+    .msg.info { background: var(--accent-soft); border-color: #b7d3f6; color: #184f95; }
+
+    figure { margin: 0; }
+    figure img { width: 100%; height: auto; display: block; border-radius: 8px; }
+
+    details { border-top: 1px solid var(--line); padding-top: 10px; margin-top: 10px; }
+    summary { cursor: pointer; font-size: 13px; font-weight: 600; color: var(--accent); }
+    .pager { display: flex; gap: 10px; align-items: center; justify-content: center; margin-top: 18px; font-size: 14px; }
+
+    footer.foot { border-top: 1px solid var(--line); margin-top: 40px; padding: 20px 24px 40px; }
+    footer.foot .inner { max-width: 1180px; margin: 0 auto; color: var(--ink-muted); font-size: 12.5px; }
+  </style>
+</head>
+<body>
+<header class="top">
+  <div class="bar">
+    <div class="brand">Retention BDSS
+      <span>Interpretable churn prediction and decision support</span>
+    </div>
+    {% if user.is_authenticated %}
+      <nav>
+        <a href="{% url 'dashboard:index' %}" class="{% block nav_index %}{% endblock %}">Overview</a>
+        <a href="{% url 'dashboard:upload' %}" class="{% block nav_upload %}{% endblock %}">Score customers</a>
+        <a href="{% url 'dashboard:history' %}" class="{% block nav_history %}{% endblock %}">History</a>
+        <a href="{% url 'dashboard:taxonomy' %}" class="{% block nav_taxonomy %}{% endblock %}">Intervention taxonomy</a>
+        <a href="{% url 'dashboard:registry' %}" class="{% block nav_registry %}{% endblock %}">Model registry</a>
+      </nav>
+      <div class="who">
+        <span>{{ user.get_username }}</span>
+        <form action="{% url 'logout' %}" method="post" style="display:inline">
+          {% csrf_token %}
+          <button type="submit" class="linkbtn">Sign out</button>
+        </form>
+      </div>
+    {% endif %}
+  </div>
+</header>
+
+<main>
+  {% if messages %}
+    {% for message in messages %}
+      <div class="msg {{ message.tags }}">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+  {% block content %}{% endblock %}
+</main>
+
+<footer class="foot">
+  <div class="inner">
+    <strong>The system is advisory.</strong> Every recommendation may be overridden, and every override is logged and
+    reviewed. Shapley attributions describe how the model behaves, not why a customer behaves as they do: treating the
+    stated driver will not always avert the churn. Demographic attributes are audited and explained but never converted
+    into a differential offer.
+  </div>
+</footer>
+</body>
+</html>

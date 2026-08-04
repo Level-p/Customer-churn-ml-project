@@ -1,0 +1,39 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Sign in - Retention BDSS{% endblock %}
+
+{% block content %}
+<div style="max-width:420px;margin:6vh auto 0">
+  <h1>Sign in</h1>
+  <p class="lede" style="margin-bottom:20px">
+    This system holds customer-level risk estimates and the reasons behind them. Access is by account, and every
+    prediction served is attributed to the person who requested it.
+  </p>
+
+  <div class="card">
+    <form method="post">
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        <div class="msg error">Wrong username or password.</div>
+      {% endif %}
+
+      <div class="field">
+        <label for="{{ form.username.id_for_label }}">Username</label>
+        {{ form.username }}
+      </div>
+      <div class="field">
+        <label for="{{ form.password.id_for_label }}">Password</label>
+        {{ form.password }}
+      </div>
+
+      <input type="hidden" name="next" value="{{ next }}">
+      <button type="submit" class="btn" style="width:100%">Sign in</button>
+    </form>
+  </div>
+
+  <p class="help" style="text-align:center">
+    No account? An administrator creates one with
+    <code>python manage.py createsuperuser</code>.
+  </p>
+</div>
+{% endblock %}

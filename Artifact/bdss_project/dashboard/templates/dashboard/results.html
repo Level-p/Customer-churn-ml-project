@@ -1,0 +1,204 @@
+{% extends "dashboard/base.html" %}
+{% block title %}{{ batch.source_filename }} - Retention BDSS{% endblock %}
+{% block nav_history %}active{% endblock %}
+
+{% block content %}
+<h1>{{ batch.source_filename }}</h1>
+<p class="lede">
+  {{ batch.row_count }} customers scored by <strong>{{ batch.model_label }}</strong>, version {{ batch.model_version }},
+  on {{ batch.created_at|date:"j F Y \a\t H:i" }}. Operating threshold
+  {{ batch.threshold|floatformat:3|default:"arg-max" }}. Taxonomy v{{ batch.taxonomy_version }}.
+</p>
+
+{% if batch.missing_columns %}
+  <div class="msg warning">
+    <strong>{{ batch.missing_columns|length }} expected column{{ batch.missing_columns|length|pluralize }} were absent
+    from this file</strong> and were imputed: {{ batch.missing_columns|join:", " }}. These scores rest on incomplete
+    inputs; treat them as indicative rather than decisive.
+  </div>
+{% endif %}
+
+<div class="grid tiles" style="margin-bottom:20px">
+  <div class="tile">
+    <div class="key">Above threshold</div>
+    <div class="value">{{ summary.flagged }}</div>
+    <div class="note">{{ summary.flagged_pct }}% of the uploaded base</div>
+  </div>
+  <div class="tile">
+    <div class="key">P1 - act now</div>
+    <div class="value">{{ summary.priorities.P1|default:"0" }}</div>
+    <div class="note">worked first: risk weighted by value</div>
+  </div>
+  <div class="tile">
+    <div class="key">Mean churn risk</div>
+    <div class="value">{{ summary.mean_probability|floatformat:2 }}</div>
+    <div class="note">calibrated probability</div>
+  </div>
+  <div class="tile">
+    <div class="key">Flagged for review</div>
+    <div class="value">{{ summary.caveated }}</div>
+    <div class="note">explanations carrying a caveat</div>
+  </div>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <figure>
+      <img src="data:image/png;base64,{{ charts.risk }}"
+           alt="Histogram of calibrated churn probability across the uploaded base, with the operating threshold marked.">
+    </figure>
+  </div>
+  <div class="card">
+    <figure>
+      <img src="data:image/png;base64,{{ charts.priority }}"
+           alt="Bar chart of the recommended work queue by priority: P1 act now, P2 act this cycle, P3 monitor.">
+    </figure>
+  </div>
+</div>
+
+{% if charts.drivers %}
+<div class="card">
+  <figure>
+    <img src="data:image/png;base64,{{ charts.drivers }}"
+         alt="Horizontal bar chart of the share of total attribution carried by each feature category across this batch.">
+  </figure>
+  <p class="help">
+    This is the campaign-level read. Where one category dominates, the answer is usually a single structural change --
+    a pricing review, an onboarding fix -- rather than a hundred individual calls.
+  </p>
+</div>
+{% endif %}
+
+<div class="card">
+  <div style="display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px">
+    <h2 style="margin:0;flex:1">Retention queue</h2>
+    {% if overridden %}<span class="chip">{{ overridden }} override{{ overridden|pluralize }} recorded</span>{% endif %}
+    {% if only_at_risk %}
+      <a class="btn ghost small" href="{% url 'dashboard:results' batch.pk %}">Show all customers</a>
+    {% else %}
+      <a class="btn ghost small" href="{% url 'dashboard:results' batch.pk %}?only_at_risk=1">Show only those above threshold</a>
+    {% endif %}
+    <a class="btn small" href="{% url 'dashboard:export' batch.pk %}">Export CSV for the CRM</a>
+  </div>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th>
+          <th class="num">Churn risk</th>
+          <th>Why (three strongest drivers)</th>
+          <th>Recommended action</th>
+          <th>Owner</th>
+          <th>Priority</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for prediction in page %}
+        <tr id="prediction-{{ prediction.pk }}">
+          <td>
+            <strong>{{ prediction.customer_ref|default:prediction.pk }}</strong>
+            {% if prediction.is_overridden %}
+              <br><span class="chip">overridden</span>
+            {% endif %}
+          </td>
+          <td class="num">
+            <span class="badge {{ prediction.band }}"><span class="dot"></span>{{ prediction.probability_pct }}%</span>
+            <div class="muted">{{ prediction.band_label }}</div>
+          </td>
+          <td>
+            {% for driver in prediction.top_drivers %}
+              <div style="margin-bottom:3px">
+                <span class="{% if driver.direction == 'increases' %}up{% else %}down{% endif %}">
+                  {% if driver.direction == 'increases' %}&uarr;{% else %}&darr;{% endif %}
+                </span>
+                {{ driver.label }}
+                <span class="chip">{{ driver.category_label }}</span>
+                {% if driver.protected %}
+                  <span class="chip" style="border-color:#b7d3f6;background:var(--accent-soft);color:var(--accent)"
+                        title="A demographic attribute. Shown because it drives the estimate; never used to build an offer.">not used for offers</span>
+                {% endif %}
+                {% if driver.contested %}
+                  <span class="chip" style="border-color:#fedf89;background:var(--medium-soft);color:var(--medium)"
+                        title="SHAP and LIME disagreed about this driver during the explanation audit">disputed</span>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </td>
+          <td>
+            {{ prediction.recommendation }}
+            {% if prediction.caveats %}
+              {% for caveat in prediction.caveats %}
+                <div class="msg warning" style="margin:8px 0 0;padding:8px 10px;font-size:12.5px">{{ caveat }}</div>
+              {% endfor %}
+            {% endif %}
+            <details>
+              <summary>Why this action, and what to do if it is wrong</summary>
+              <p class="muted" style="margin:8px 0">{{ prediction.rationale }}</p>
+              {% if prediction.is_overridden %}
+                <div class="msg info" style="font-size:13px">
+                  <strong>{{ prediction.get_override_action_display }}</strong> &mdash;
+                  {{ prediction.override_reason }}
+                  <div class="muted">{{ prediction.overridden_by.get_username }}, {{ prediction.overridden_at|date:"j M Y H:i" }}</div>
+                </div>
+              {% else %}
+                <form method="post" action="{% url 'dashboard:override' prediction.pk %}">
+                  {% csrf_token %}
+                  <fieldset style="border:0;padding:0;margin:0 0 8px">
+                    <legend class="muted" style="padding:0 0 6px">You know the customer. The model does not.</legend>
+                    {% for value, label in override_choices %}
+                      <label style="font-weight:400;display:flex;gap:7px;align-items:center;margin-bottom:3px">
+                        <input type="radio" name="action" value="{{ value }}" style="width:auto" required>
+                        <span>{{ label }}</span>
+                      </label>
+                    {% endfor %}
+                  </fieldset>
+                  <textarea name="reason" rows="2" required
+                            placeholder="Why? e.g. the customer renewed last week"></textarea>
+                  <button type="submit" class="btn ghost small" style="margin-top:8px">Record override</button>
+                </form>
+              {% endif %}
+            </details>
+          </td>
+          <td><span class="chip">{{ prediction.business_owner }}</span></td>
+          <td>
+            <span class="badge {{ prediction.priority }}"><span class="dot"></span>{{ prediction.priority }}</span>
+            <div class="muted num">{{ prediction.priority_score|floatformat:2 }}</div>
+          </td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="6" class="muted">No customers match this filter.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page.paginator.num_pages > 1 %}
+    <div class="pager">
+      {% if page.has_previous %}
+        <a class="btn ghost small" href="?page={{ page.previous_page_number }}{% if only_at_risk %}&only_at_risk=1{% endif %}">Previous</a>
+      {% endif %}
+      <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }} &middot; {{ page.paginator.count }} customers</span>
+      {% if page.has_next %}
+        <a class="btn ghost small" href="?page={{ page.next_page_number }}{% if only_at_risk %}&only_at_risk=1{% endif %}">Next</a>
+      {% endif %}
+    </div>
+  {% endif %}
+</div>
+
+{% if summary.owners %}
+<div class="card">
+  <h2>Where the work lands</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Team</th><th class="num">Customers routed</th></tr></thead>
+      <tbody>
+      {% for owner, count in summary.owners.items %}
+        <tr><td>{{ owner }}</td><td class="num">{{ count }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

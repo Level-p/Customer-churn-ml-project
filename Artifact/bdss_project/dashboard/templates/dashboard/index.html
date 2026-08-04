@@ -1,0 +1,158 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Overview - Retention BDSS{% endblock %}
+{% block nav_index %}active{% endblock %}
+
+{% block content %}
+<h1>Overview</h1>
+<p class="lede">
+  Upload a customer list, and the system returns each customer's churn risk, the three strongest drivers of that risk in
+  plain business language, and a recommended retention action with an owner and a priority. Nothing here requires you to
+  read a probability curve.
+</p>
+
+<div class="grid tiles" style="margin-bottom:20px">
+  <div class="tile">
+    <div class="key">Customers scored</div>
+    <div class="value">{{ totals.predictions|default:"0" }}</div>
+    <div class="note">across {{ totals.batches }} batch{{ totals.batches|pluralize:"es" }}</div>
+  </div>
+  <div class="tile">
+    <div class="key">Flagged at risk</div>
+    <div class="value">{{ totals.flagged }}</div>
+    <div class="note">above the operating threshold</div>
+  </div>
+  <div class="tile">
+    <div class="key">P1 - act now</div>
+    <div class="value">{{ totals.priorities.P1|default:"0" }}</div>
+    <div class="note">highest priority in the queue</div>
+  </div>
+  <div class="tile">
+    <div class="key">Overrides logged</div>
+    <div class="value">{{ totals.override_rate }}%</div>
+    <div class="note">
+      {{ totals.overrides }} recommendation{{ totals.overrides|pluralize }} rejected or changed.
+      {% if totals.predictions and totals.overrides == 0 %}
+        <strong>Nobody has disagreed with the model yet.</strong>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <h2>Models available</h2>
+    {% if models %}
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr>
+              <th>Model</th>
+              <th class="num">F1</th>
+              <th class="num">Recall</th>
+              <th class="num">SHAP~LIME</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for model in models %}
+            <tr>
+              <td>
+                <strong>{{ model.model_label }}</strong><br>
+                <span class="muted">{{ model.label|cut:model.model_label|cut:" - " }} &middot; v{{ model.version }}</span>
+              </td>
+              <td class="num">{{ model.metrics.f1|floatformat:3 }}</td>
+              <td class="num">{{ model.metrics.recall|floatformat:3 }}</td>
+              <td class="num">
+                {% if model.explanation_audit.mean_top_k_overlap %}
+                  {{ model.explanation_audit.mean_top_k_overlap|floatformat:2 }}
+                {% else %}<span class="muted">n/a</span>{% endif %}
+              </td>
+              <td class="num">
+                <a class="btn ghost small" href="{% url 'dashboard:model_card' model.model_key model.dataset %}">Model card</a>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="help" style="margin-top:12px">
+        SHAP~LIME is the share of a customer's leading drivers on which two independent explainers agree. A model whose
+        explanations cannot be corroborated should not be driving offers, however well it ranks.
+      </p>
+    {% else %}
+      <div class="msg warning">
+        No models are registered yet. Train them first:
+        <code>python -m ml.train_all --dataset bank_churn</code>
+      </div>
+    {% endif %}
+    <p style="margin:16px 0 0"><a class="btn" href="{% url 'dashboard:upload' %}">Score a customer list</a></p>
+  </div>
+
+  <div class="card">
+    <h2>Recent batches</h2>
+    {% if batches %}
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>File</th><th>Model</th><th class="num">Rows</th><th class="num">At risk</th><th></th></tr>
+          </thead>
+          <tbody>
+          {% for batch in batches %}
+            <tr>
+              <td>
+                {{ batch.source_filename }}<br>
+                <span class="muted">{{ batch.created_at|date:"j M Y, H:i" }} &middot; {{ batch.user.get_username|default:"system" }}</span>
+              </td>
+              <td>{{ batch.model_label }}<br><span class="muted">v{{ batch.model_version }}</span></td>
+              <td class="num">{{ batch.row_count }}</td>
+              <td class="num">{{ batch.flagged_count }} <span class="muted">({{ batch.flagged_pct }}%)</span></td>
+              <td class="num"><a class="btn ghost small" href="{{ batch.get_absolute_url }}">Open</a></td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    {% else %}
+      <p class="muted">No customer lists have been scored yet.</p>
+    {% endif %}
+  </div>
+</div>
+
+{% if recent %}
+<div class="card">
+  <h2>Latest predictions</h2>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Customer</th><th class="num">Churn risk</th><th>Leading driver</th>
+          <th>Recommended action</th><th>Owner</th><th>Priority</th><th>Scored by</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for prediction in recent %}
+        <tr>
+          <td>{{ prediction.customer_ref|default:prediction.pk }}</td>
+          <td class="num">
+            <span class="badge {{ prediction.band }}"><span class="dot"></span>{{ prediction.probability_pct }}% {{ prediction.band_label }}</span>
+          </td>
+          <td>
+            {% with driver=prediction.top_drivers.0 %}
+              {{ driver.label }}
+              <span class="{% if driver.direction == 'increases' %}up{% else %}down{% endif %}">
+                {% if driver.direction == 'increases' %}&uarr;{% else %}&darr;{% endif %}
+              </span>
+            {% endwith %}
+          </td>
+          <td>{{ prediction.recommendation }}</td>
+          <td><span class="chip">{{ prediction.business_owner }}</span></td>
+          <td><span class="badge {{ prediction.priority }}"><span class="dot"></span>{{ prediction.priority }}</span></td>
+          <td class="muted">{{ prediction.model_label }}<br>v{{ prediction.model_version }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

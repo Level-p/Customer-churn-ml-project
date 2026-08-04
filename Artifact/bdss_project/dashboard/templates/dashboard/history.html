@@ -1,0 +1,49 @@
+{% extends "dashboard/base.html" %}
+{% block title %}History - Retention BDSS{% endblock %}
+{% block nav_history %}active{% endblock %}
+
+{% block content %}
+<h1>Scoring history</h1>
+<p class="lede">
+  Every customer list this system has scored, with the model and taxonomy versions that were in force at the time.
+</p>
+
+<div class="card">
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>File</th><th>Scored</th><th>By</th><th>Model</th>
+          <th class="num">Rows</th><th class="num">At risk</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for batch in page %}
+        <tr>
+          <td>
+            <strong>{{ batch.source_filename }}</strong>
+            {% if batch.missing_columns %}<br><span class="chip">{{ batch.missing_columns|length }} column(s) imputed</span>{% endif %}
+          </td>
+          <td>{{ batch.created_at|date:"j M Y, H:i" }}</td>
+          <td>{{ batch.user.get_username|default:"system" }}</td>
+          <td>{{ batch.model_label }}<br><span class="muted">v{{ batch.model_version }} &middot; taxonomy v{{ batch.taxonomy_version }}</span></td>
+          <td class="num">{{ batch.row_count }}</td>
+          <td class="num">{{ batch.flagged_count }} <span class="muted">({{ batch.flagged_pct }}%)</span></td>
+          <td class="num"><a class="btn ghost small" href="{{ batch.get_absolute_url }}">Open</a></td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="7" class="muted">No customer lists have been scored yet.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  {% if page.paginator.num_pages > 1 %}
+    <div class="pager">
+      {% if page.has_previous %}<a class="btn ghost small" href="?page={{ page.previous_page_number }}">Previous</a>{% endif %}
+      <span class="muted">Page {{ page.number }} of {{ page.paginator.num_pages }}</span>
+      {% if page.has_next %}<a class="btn ghost small" href="?page={{ page.next_page_number }}">Next</a>{% endif %}
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

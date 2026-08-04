@@ -1,0 +1,72 @@
+{% extends "dashboard/base.html" %}
+{% block title %}Intervention taxonomy - Retention BDSS{% endblock %}
+{% block nav_taxonomy %}active{% endblock %}
+
+{% block content %}
+<h1>Intervention taxonomy</h1>
+<p class="lede">
+  This is the rule table that turns a churn driver into an action, an owner and a priority. It is a data file, not code:
+  a retention manager can edit it when the offers change, and the system picks the change up on the next scoring run
+  without a redeployment. It is published here because a rule table nobody outside the team can read is a rule table
+  nobody outside the team can challenge.
+</p>
+
+<div class="card">
+  <div style="display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:12px">
+    <h2 style="margin:0;flex:1">{{ table.name }} &middot; v{{ table.version }}</h2>
+    <span class="chip">{{ rows|length }} rules</span>
+    <span class="chip">owner: {{ table.owner }}</span>
+  </div>
+  <p class="muted" style="font-size:12.5px;word-break:break-all">{{ path }}</p>
+
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>When the driver is</th>
+          <th>and the prediction is</th>
+          <th>Recommended intervention</th>
+          <th>Owner</th>
+          <th class="num">Weight</th>
+          <th class="num">Applied</th>
+        </tr>
+      </thead>
+      <tbody>
+      {% for row in rows %}
+        <tr>
+          <td>
+            <strong>{{ row.driver }}</strong>
+            {% if row.category %}<br><span class="chip">{{ row.category }}</span>{% endif %}
+            {% if row.direction != "any" %}<span class="chip">{{ row.direction }} risk</span>{% endif %}
+          </td>
+          <td><span class="chip">{{ row.applies_to }}</span></td>
+          <td>
+            {{ row.intervention }}
+            <details>
+              <summary>Rationale</summary>
+              <p class="muted" style="margin:8px 0 0">{{ row.rationale }}</p>
+            </details>
+          </td>
+          <td><span class="chip">{{ row.owner }}</span></td>
+          <td class="num">{{ row.weight }}</td>
+          <td class="num">{{ row.times_applied }}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="help" style="margin-top:12px">
+    Rules are read in order, and the first one that matches a customer's strongest actionable driver wins.
+    "Applied" counts how often each rule has produced a recommendation in this system's history &mdash; a rule that never
+    fires is dead weight, and a rule that fires for everything is not discriminating.
+    {% if unmatched %}<strong>{{ unmatched }} customer(s) matched no rule</strong> and were referred for manual review.{% endif %}
+  </p>
+</div>
+
+<div class="card">
+  <h2>What this table assumes, and does not know</h2>
+  {% for note in notes %}
+    <p class="muted" style="margin:0 0 6px">{{ note }}</p>
+  {% endfor %}
+</div>
+{% endblock %}

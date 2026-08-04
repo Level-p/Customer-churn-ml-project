@@ -1,0 +1,33 @@
+# Business Decision Support System - pinned dependencies.
+#
+# Versions are the ones the pipeline and the web application were actually built
+# and tested against, on Python 3.13. Pinning is not pedantry here: a churn model
+# is a pickled object graph, and an artefact trained under one scikit-learn and
+# unpickled under another is a silent-failure risk, not a compatibility warning.
+#
+#     python -m venv .venv
+#     .venv\Scripts\activate          (Windows)   or   source .venv/bin/activate
+#     pip install -r requirements.txt
+
+# --- Core scientific stack ---
+numpy==2.4.6
+pandas==3.0.3
+scipy==1.18.0
+joblib==1.5.3
+
+# --- Models ---
+scikit-learn==1.9.0
+xgboost==3.3.0
+imbalanced-learn==0.14.2        # SMOTE, and the pipeline that keeps it inside the fold
+optuna==4.9.0                   # Bayesian search over the boosting parameters
+
+# --- Explanation layer ---
+shap==0.52.0                    # exact Shapley values for the tree ensembles
+lime==0.2.0.1                   # the independent explainer SHAP is audited against
+
+# --- Web application ---
+Django==4.2.30                  # 4.2 LTS
+djangorestframework==3.17.1
+
+# --- Charts ---
+matplotlib==3.11.0              # rendered server-side; the dashboard loads no external asset

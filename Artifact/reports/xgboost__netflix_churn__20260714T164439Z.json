@@ -1,0 +1,698 @@
+{
+  "model_key": "xgboost",
+  "model_label": "XGBoost",
+  "dataset": "netflix_churn",
+  "dataset_domain": "Subscription streaming",
+  "dataset_description": "Streaming subscribers. The positive class is a subscriber who has cancelled the service.",
+  "version": "20260714T164439Z",
+  "task": "binary",
+  "classes": [
+    0,
+    1
+  ],
+  "class_order": [
+    0,
+    1
+  ],
+  "positive_label": 1,
+  "focus_label": 1,
+  "focus_index": 1,
+  "target": "churned",
+  "threshold": 0.6666666666666666,
+  "threshold_choice": {
+    "threshold": 0.6666666666666666,
+    "precision": 0.997997997997998,
+    "recall": 0.9910536779324056,
+    "f1": 0.9945137157107233,
+    "min_precision": 0.6,
+    "satisfied_floor": true,
+    "rationale": "max F1 among thresholds with precision >= 0.60"
+  },
+  "feature_columns": [
+    "age",
+    "watch_hours",
+    "last_login_days",
+    "monthly_fee",
+    "number_of_profiles",
+    "avg_watch_time_per_day",
+    "watch_per_profile",
+    "fee_per_profile",
+    "is_dormant",
+    "gender",
+    "subscription_type",
+    "region",
+    "device",
+    "payment_method",
+    "favorite_genre"
+  ],
+  "numeric_columns": [
+    "age",
+    "watch_hours",
+    "last_login_days",
+    "monthly_fee",
+    "number_of_profiles",
+    "avg_watch_time_per_day",
+    "watch_per_profile",
+    "fee_per_profile",
+    "is_dormant"
+  ],
+  "categorical_columns": [
+    "gender",
+    "subscription_type",
+    "region",
+    "device",
+    "payment_method",
+    "favorite_genre"
+  ],
+  "transformed_feature_names": [
+    "num__age",
+    "num__watch_hours",
+    "num__last_login_days",
+    "num__monthly_fee",
+    "num__number_of_profiles",
+    "num__avg_watch_time_per_day",
+    "num__watch_per_profile",
+    "num__fee_per_profile",
+    "num__is_dormant",
+    "cat__gender_Female",
+    "cat__gender_Male",
+    "cat__gender_Other",
+    "cat__subscription_type_Basic",
+    "cat__subscription_type_Premium",
+    "cat__subscription_type_Standard",
+    "cat__region_Africa",
+    "cat__region_Asia",
+    "cat__region_Europe",
+    "cat__region_North America",
+    "cat__region_Oceania",
+    "cat__region_South America",
+    "cat__device_Desktop",
+    "cat__device_Laptop",
+    "cat__device_Mobile",
+    "cat__device_TV",
+    "cat__device_Tablet",
+    "cat__payment_method_Credit Card",
+    "cat__payment_method_Crypto",
+    "cat__payment_method_Debit Card",
+    "cat__payment_method_Gift Card",
+    "cat__payment_method_PayPal",
+    "cat__favorite_genre_Action",
+    "cat__favorite_genre_Comedy",
+    "cat__favorite_genre_Documentary",
+    "cat__favorite_genre_Drama",
+    "cat__favorite_genre_Horror",
+    "cat__favorite_genre_Romance",
+    "cat__favorite_genre_Sci-Fi"
+  ],
+  "dropped_columns": {
+    "near_zero_variance": [],
+    "correlated": [
+      "watch_per_fee",
+      "engagement_decay"
+    ]
+  },
+  "hyperparameters": {
+    "learning_rate": 0.17711419816247456,
+    "max_depth": 9,
+    "min_child_weight": 5,
+    "subsample": 0.7863119692518593,
+    "colsample_bytree": 0.7592075149479794,
+    "gamma": 0.35432078524393085,
+    "reg_lambda": 0.008237898876372425,
+    "reg_alpha": 0.00043538560268754835,
+    "n_estimators": 600,
+    "scale_pos_weight": 1.0044855952003247
+  },
+  "cross_validation": {
+    "scoring": "average_precision",
+    "folds": 10,
+    "best_score": 0.9998003521762545,
+    "best_score_std": 0.00047860606566489476,
+    "candidates": 25,
+    "sampler": "TPE (Bayesian)"
+  },
+  "calibration": {
+    "method": "isotonic",
+    "folds": 5,
+    "brier_raw": 0.004886126205152122,
+    "brier_calibrated": 0.004021677071648271,
+    "improvement": 0.000864449133503851
+  },
+  "metrics": {
+    "accuracy": 0.992,
+    "precision": 0.9940119760479041,
+    "recall": 0.9900596421471173,
+    "f1": 0.9920318725099602,
+    "roc_auc": 0.999877995607842,
+    "mcc": 0.9840076802795611,
+    "brier": 0.004524974070215432
+  },
+  "evaluation": {
+    "task": "binary",
+    "classes": [
+      0,
+      1
+    ],
+    "threshold": 0.6666666666666666,
+    "accuracy": 0.992,
+    "precision": 0.9940119760479041,
+    "recall": 0.9900596421471173,
+    "f1": 0.9920318725099602,
+    "roc_auc": 0.999877995607842,
+    "mcc": 0.9840076802795611,
+    "brier": 0.004524974070215432,
+    "confusion_matrix": [
+      [
+        494,
+        3
+      ],
+      [
+        5,
+        498
+      ]
+    ],
+    "per_class": {
+      "0": {
+        "precision": 0.9899799599198397,
+        "recall": 0.993963782696177,
+        "f1": 0.9919678714859438
+      },
+      "1": {
+        "precision": 0.9940119760479041,
+        "recall": 0.9900596421471173,
+        "f1": 0.9920318725099602
+      }
+    },
+    "support": {
+      "0": 497,
+      "1": 503
+    },
+    "profit": {
+      "true_positives": 498,
+      "false_positives": 3,
+      "false_negatives": 5,
+      "true_negatives": 494,
+      "total_value": 48755.0,
+      "value_per_record": 48.755,
+      "records_targeted": 501,
+      "value_per_targeted_record": 97.31536926147704,
+      "economics": {
+        "value_true_positive": 100.0,
+        "cost_false_positive": 15.0,
+        "cost_false_negative": 200.0,
+        "value_true_negative": 0.0
+      }
+    },
+    "report_text": "              precision    recall  f1-score   support\n\n           0       0.99      0.99      0.99       497\n           1       0.99      0.99      0.99       503\n\n    accuracy                           0.99      1000\n   macro avg       0.99      0.99      0.99      1000\nweighted avg       0.99      0.99      0.99      1000\n",
+    "extras": {}
+  },
+  "global_importance": [
+    {
+      "rank": 1,
+      "feature": "num__avg_watch_time_per_day",
+      "label": "Average daily viewing",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 3.4656679191645234,
+      "mean_shap": -0.369029901040718,
+      "direction": "decreases"
+    },
+    {
+      "rank": 2,
+      "feature": "num__watch_hours",
+      "label": "Hours watched",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 3.3152226077578963,
+      "mean_shap": 0.060053786035627124,
+      "direction": "increases"
+    },
+    {
+      "rank": 3,
+      "feature": "num__last_login_days",
+      "label": "Days since last login",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 3.02637295126915,
+      "mean_shap": 0.2436798758506775,
+      "direction": "increases"
+    },
+    {
+      "rank": 4,
+      "feature": "num__monthly_fee",
+      "label": "Monthly fee",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 1.8750452584028243,
+      "mean_shap": -0.24233668911457062,
+      "direction": "decreases"
+    },
+    {
+      "rank": 5,
+      "feature": "num__number_of_profiles",
+      "label": "Profiles on the account",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 1.7940701366215945,
+      "mean_shap": 0.07473944981396198,
+      "direction": "increases"
+    },
+    {
+      "rank": 6,
+      "feature": "cat__payment_method_Gift Card",
+      "label": "Payment method: Gift Card",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 1.080827310860157,
+      "mean_shap": -0.16672773748636247,
+      "direction": "decreases"
+    },
+    {
+      "rank": 7,
+      "feature": "cat__payment_method_Crypto",
+      "label": "Payment method: Crypto",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 1.0632408382892609,
+      "mean_shap": -0.004855587720870972,
+      "direction": "decreases"
+    },
+    {
+      "rank": 8,
+      "feature": "cat__subscription_type_Basic",
+      "label": "Subscription tier: Basic",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.5866856655478477,
+      "mean_shap": -0.0940265600681305,
+      "direction": "decreases"
+    },
+    {
+      "rank": 9,
+      "feature": "num__fee_per_profile",
+      "label": "Fee per profile",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.5550255559235812,
+      "mean_shap": 0.0598972634524107,
+      "direction": "increases"
+    },
+    {
+      "rank": 10,
+      "feature": "num__is_dormant",
+      "label": "Dormant (no login for 30 days)",
+      "category": "uncategorised",
+      "category_label": "Other",
+      "protected": false,
+      "mean_abs_shap": 0.3643170367330313,
+      "mean_shap": -0.030466707453131677,
+      "direction": "decreases"
+    },
+    {
+      "rank": 11,
+      "feature": "num__watch_per_profile",
+      "label": "Viewing per profile",
+      "category": "behavioural",
+      "category_label": "Usage and activity",
+      "protected": false,
+      "mean_abs_shap": 0.1980795094501227,
+      "mean_shap": 0.020257067123427987,
+      "direction": "increases"
+    },
+    {
+      "rank": 12,
+      "feature": "num__age",
+      "label": "Age",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.13401553969830274,
+      "mean_shap": -0.0032352184504270552,
+      "direction": "decreases"
+    },
+    {
+      "rank": 13,
+      "feature": "cat__payment_method_Credit Card",
+      "label": "Payment method: Credit Card",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.11801625299826264,
+      "mean_shap": -0.008248060192912817,
+      "direction": "decreases"
+    },
+    {
+      "rank": 14,
+      "feature": "cat__payment_method_Debit Card",
+      "label": "Payment method: Debit Card",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.09290577477030457,
+      "mean_shap": -0.0014339140821248294,
+      "direction": "decreases"
+    },
+    {
+      "rank": 15,
+      "feature": "cat__subscription_type_Premium",
+      "label": "Subscription tier: Premium",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.08520657938346267,
+      "mean_shap": -0.005398503247648478,
+      "direction": "decreases"
+    },
+    {
+      "rank": 16,
+      "feature": "cat__subscription_type_Standard",
+      "label": "Subscription tier: Standard",
+      "category": "contractual",
+      "category_label": "Contract and products",
+      "protected": false,
+      "mean_abs_shap": 0.06729321203194559,
+      "mean_shap": 0.002292680775746703,
+      "direction": "increases"
+    },
+    {
+      "rank": 17,
+      "feature": "cat__device_TV",
+      "label": "Primary device: TV",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.06510131838405504,
+      "mean_shap": -0.0018491188534535468,
+      "direction": "decreases"
+    },
+    {
+      "rank": 18,
+      "feature": "cat__gender_Male",
+      "label": "Gender: Male",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.04695366456964985,
+      "mean_shap": -0.0007829839452169836,
+      "direction": "decreases"
+    },
+    {
+      "rank": 19,
+      "feature": "cat__region_South America",
+      "label": "Region: South America",
+      "category": "demographic",
+      "category_label": "Demographic",
+      "protected": true,
+      "mean_abs_shap": 0.04124928169278428,
+      "mean_shap": 0.004468664548825473,
+      "direction": "increases"
+    },
+    {
+      "rank": 20,
+      "feature": "cat__payment_method_PayPal",
+      "label": "Payment method: PayPal",
+      "category": "transactional",
+      "category_label": "Money and payments",
+      "protected": false,
+      "mean_abs_shap": 0.037770996612263845,
+      "mean_shap": 0.006083844973007217,
+      "direction": "increases"
+    }
+  ],
+  "explanation_audit": {
+    "records_audited": 100,
+    "top_k": 5,
+    "mean_top_k_overlap": 0.7939999999999999,
+    "mean_jaccard": 0.6807142857142859,
+    "mean_order_agreement": 0.5664888888888888,
+    "lime_stability": 0.8252380952380953,
+    "contested_features": [
+      {
+        "feature": "num__fee_per_profile",
+        "label": "Fee per profile",
+        "shap_top_k_count": 6,
+        "lime_disagreements": 6,
+        "disagreement_rate": 1.0
+      },
+      {
+        "feature": "cat__payment_method_Crypto",
+        "label": "Payment method: Crypto",
+        "shap_top_k_count": 20,
+        "lime_disagreements": 13,
+        "disagreement_rate": 0.65
+      },
+      {
+        "feature": "num__watch_hours",
+        "label": "Hours watched",
+        "shap_top_k_count": 86,
+        "lime_disagreements": 21,
+        "disagreement_rate": 0.2441860465116279
+      },
+      {
+        "feature": "num__monthly_fee",
+        "label": "Monthly fee",
+        "shap_top_k_count": 88,
+        "lime_disagreements": 21,
+        "disagreement_rate": 0.23863636363636365
+      },
+      {
+        "feature": "num__avg_watch_time_per_day",
+        "label": "Average daily viewing",
+        "shap_top_k_count": 82,
+        "lime_disagreements": 18,
+        "disagreement_rate": 0.21951219512195122
+      },
+      {
+        "feature": "num__number_of_profiles",
+        "label": "Profiles on the account",
+        "shap_top_k_count": 86,
+        "lime_disagreements": 18,
+        "disagreement_rate": 0.20930232558139536
+      },
+      {
+        "feature": "cat__payment_method_Gift Card",
+        "label": "Payment method: Gift Card",
+        "shap_top_k_count": 33,
+        "lime_disagreements": 4,
+        "disagreement_rate": 0.12121212121212122
+      }
+    ]
+  },
+  "contested_features": [
+    "num__fee_per_profile",
+    "cat__payment_method_Crypto"
+  ],
+  "fairness": {
+    "sensitive_attributes": [
+      "gender",
+      "region",
+      "age"
+    ],
+    "attributes": {
+      "gender": {
+        "label": "Gender",
+        "segments": [
+          {
+            "group": "Male",
+            "records": 347,
+            "base_rate": 0.48703170028818443,
+            "selection_rate": 0.484149855907781,
+            "true_positive_rate": 0.9881656804733728,
+            "false_positive_rate": 0.0056179775280898875,
+            "precision": 0.9940476190476191,
+            "reliable": true
+          },
+          {
+            "group": "Female",
+            "records": 344,
+            "base_rate": 0.5319767441860465,
+            "selection_rate": 0.5290697674418605,
+            "true_positive_rate": 0.9890710382513661,
+            "false_positive_rate": 0.006211180124223602,
+            "precision": 0.9945054945054945,
+            "reliable": true
+          },
+          {
+            "group": "Other",
+            "records": 309,
+            "base_rate": 0.4886731391585761,
+            "selection_rate": 0.4886731391585761,
+            "true_positive_rate": 0.9933774834437086,
+            "false_positive_rate": 0.006329113924050633,
+            "precision": 0.9933774834437086,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.915096430946575,
+        "true_positive_rate_gap": 0.005211802970335744,
+        "flags": []
+      },
+      "region": {
+        "label": "Region",
+        "segments": [
+          {
+            "group": "Europe",
+            "records": 192,
+            "base_rate": 0.5,
+            "selection_rate": 0.5,
+            "true_positive_rate": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "reliable": true
+          },
+          {
+            "group": "Africa",
+            "records": 173,
+            "base_rate": 0.4913294797687861,
+            "selection_rate": 0.48554913294797686,
+            "true_positive_rate": 0.9882352941176471,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "reliable": true
+          },
+          {
+            "group": "South America",
+            "records": 170,
+            "base_rate": 0.5352941176470588,
+            "selection_rate": 0.5352941176470588,
+            "true_positive_rate": 1.0,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "reliable": true
+          },
+          {
+            "group": "North America",
+            "records": 164,
+            "base_rate": 0.5,
+            "selection_rate": 0.49390243902439024,
+            "true_positive_rate": 0.975609756097561,
+            "false_positive_rate": 0.012195121951219513,
+            "precision": 0.9876543209876543,
+            "reliable": true
+          },
+          {
+            "group": "Oceania",
+            "records": 151,
+            "base_rate": 0.5099337748344371,
+            "selection_rate": 0.5231788079470199,
+            "true_positive_rate": 1.0,
+            "false_positive_rate": 0.02702702702702703,
+            "precision": 0.9746835443037974,
+            "reliable": true
+          },
+          {
+            "group": "Asia",
+            "records": 150,
+            "base_rate": 0.48,
+            "selection_rate": 0.4666666666666667,
+            "true_positive_rate": 0.9722222222222222,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.8717948717948718,
+        "true_positive_rate_gap": 0.02777777777777779,
+        "flags": []
+      },
+      "age": {
+        "label": "Age",
+        "segments": [
+          {
+            "group": "30-44",
+            "records": 286,
+            "base_rate": 0.493006993006993,
+            "selection_rate": 0.48951048951048953,
+            "true_positive_rate": 0.9929078014184397,
+            "false_positive_rate": 0.0,
+            "precision": 1.0,
+            "reliable": true
+          },
+          {
+            "group": "45-59",
+            "records": 279,
+            "base_rate": 0.4982078853046595,
+            "selection_rate": 0.4982078853046595,
+            "true_positive_rate": 0.9928057553956835,
+            "false_positive_rate": 0.007142857142857143,
+            "precision": 0.9928057553956835,
+            "reliable": true
+          },
+          {
+            "group": "60 and over",
+            "records": 219,
+            "base_rate": 0.5251141552511416,
+            "selection_rate": 0.5251141552511416,
+            "true_positive_rate": 0.991304347826087,
+            "false_positive_rate": 0.009615384615384616,
+            "precision": 0.991304347826087,
+            "reliable": true
+          },
+          {
+            "group": "Under 30",
+            "records": 216,
+            "base_rate": 0.5,
+            "selection_rate": 0.49537037037037035,
+            "true_positive_rate": 0.9814814814814815,
+            "false_positive_rate": 0.009259259259259259,
+            "precision": 0.9906542056074766,
+            "reliable": true
+          }
+        ],
+        "selection_rate_ratio": 0.9321982365460626,
+        "true_positive_rate_gap": 0.011426319936958196,
+        "flags": []
+      }
+    },
+    "proxy_candidates": [],
+    "flags": [],
+    "selection_ratio_floor": 0.8,
+    "tpr_gap_ceiling": 0.1
+  },
+  "sensitive_attributes": [
+    "gender",
+    "region",
+    "age"
+  ],
+  "value_reference": {
+    "column": "monthly_fee",
+    "median": 13.99
+  },
+  "training_snapshot": {
+    "path": "C:\\Users\\cpati\\Downloads\\B01042273\\Artifact\\datasets\\netflix\\netflix_customer_churn.csv",
+    "sha256": "16e00950956f12921625001315dff2c450c9ca14af885cb19b4035b0b6fb311e",
+    "bytes": 545934,
+    "rows_total": 5000,
+    "rows_train": 4000,
+    "rows_test": 1000,
+    "class_distribution_train": {
+      "0": 0.497,
+      "1": 0.503
+    }
+  },
+  "economics": {
+    "value_true_positive": 100.0,
+    "cost_false_positive": 15.0,
+    "cost_false_negative": 200.0,
+    "value_true_negative": 0.0
+  },
+  "seed": 42,
+  "training_seconds": 92.34,
+  "library_versions": {
+    "python": "3.13.14",
+    "scikit_learn": "1.9.0",
+    "numpy": "2.4.6",
+    "pandas": "3.0.3"
+  },
+  "created_at": "2026-07-14T16:44:39.723571+00:00",
+  "python_version": "3.13.14"
+}
