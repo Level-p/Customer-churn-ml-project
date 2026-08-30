@@ -234,7 +234,7 @@ new `DatasetConfig` whenever one exists.
 
 The streaming models score ROC-AUC 0.9999 and MCC 0.984. **That is not a result; it is a
 warning.** Churn does not behave that way in the wild. The label in that file is synthetic: a
-depth-5 decision tree recovers 93% of it from three columns, and the tree it learns is a clean
+depth-5 decision tree recovers 90% of it from three columns under five-fold cross-validation, and the tree it learns is a clean
 threshold rule over `avg_watch_time_per_day`, `last_login_days` and `watch_hours`. The models
 are rediscovering the generator that wrote the file, not predicting a cancellation.
 

@@ -1,8 +1,0 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(Artifact/.venv/Scripts/python.exe -c ' *)",
-      "PowerShell($doc = \"C:\\\\Users\\\\cpati\\\\Documents\\\\B01042273\\\\Onoja_Churn_Prediction_Interpretable_ML.docx\"; $pdf = \"C:\\\\Users\\\\cpati\\\\Documents\\\\B01042273\\\\Onoja_Churn_Prediction_Interpretable_ML.pdf\"; $word = New-Object -ComObject Word.Application; $word.Visible = $false; $word.DisplayAlerts = 0; $d = $word.Documents.Open\\($doc, $false, $true\\); $d.Fields.Update\\(\\) | Out-Null; $d.SaveAs\\([ref]$pdf, [ref]17\\); Write-Output \\(\"pages=\" + $d.ComputeStatistics\\(2\\) + \" words=\" + $d.ComputeStatistics\\(0\\)\\); $d.Close\\(0\\); $word.Quit\\(\\); Get-Process WINWORD -ErrorAction SilentlyContinue | Stop-Process -Force)"
-    ]
-  }
-}

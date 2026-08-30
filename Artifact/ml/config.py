@@ -197,7 +197,7 @@ DATASETS: dict[str, DatasetConfig] = {
         description=(
             "Streaming subscribers; the positive class has cancelled. TREAT THE "
             "METRICS WITH SUSPICION: the label is synthetic. A depth-5 decision "
-            "tree recovers 93% of it from three columns, so the near-perfect "
+            "tree recovers 90% of it from three columns, so the near-perfect "
             "scores here measure how well a model can rediscover the rule that "
             "generated the file, not how well it would predict a real "
             "cancellation. Use this dataset to exercise the framework, and the "
